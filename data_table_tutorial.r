@@ -25,16 +25,16 @@ DT = data.table(ID = c("b","b","b","a","a","c"), a = 1:6, b = 7:12, c = 13:18)
 DT
 class(DT$ID)
 
-"""
 
-DT[i, j, by]
+
+# DT[i, j, by]
 
 ##   R:      i                 j        by
 ## SQL:  where   select | update  group by
 
-The way to read it (out loud) is:
-Take DT, subset rows using i, then calculate j, grouped by by.
-"""
+# The way to read it (out loud) is:
+# Take DT, subset rows using i, then calculate j, grouped by by.
+
 
 # Get all the flights with “JFK” as the origin airport in the month of June.
 
@@ -93,4 +93,17 @@ ans
 # the current group
 
 ans <- flights[origin == 'JFK' & month == 6L, .N]
+ans
+
+# Great! But how can I refer to columns by names in j (like in a data.frame)?
+#You can refer to column names the data.frame way using with = FALSE.
+
+# Select both arr_delay and dep_delay columns the data.frame way.
+ans <- flights[,c("arr_delay", "dep_delay"), with = FALSE]
+head(ans)
+
+# aggregations
+# a) Grouping using by
+# How can we get the number of trips corresponding to each origin airport?
+ans <- flights[, .(.N), by= .(origin)]
 ans
