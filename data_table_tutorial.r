@@ -107,3 +107,51 @@ head(ans)
 # How can we get the number of trips corresponding to each origin airport?
 ans <- flights[, .(.N), by= .(origin)]
 ans
+
+# – How can we calculate the number of trips for each origin airport for carrier code “AA”?
+ans <- flights[carrier == 'AA', .(.N), by= .(origin)]
+ans
+
+# How can we get the total number of trips for each origin, dest pair for carrier code “AA”?
+ans <- flights[carrier == 'AA', .(.N), by = .(origin,dest)]
+head(ans)
+
+# How can we get the average arrival and departure delay for each orig,dest pair 
+# for each month for carrier code “AA”?
+ans <- flights[carrier == 'AA', .(mean(arr_delay),mean(dep_delay)), .(origin,dest,month) ]
+ans
+
+# b) keyby
+# data.table retaining the original order of groups is intentional and by design. 
+# There are cases when preserving the original order is essential. But at times 
+# we would like to automatically sort by the variables we grouped by.
+
+# So how can we directly order by all the grouping variables?
+
+ans <- flights[carrier == 'AA', .(mean(arr_delay),mean(dep_delay)), 
+               keyby = .(origin,dest,month) ] # change by to keyby to order
+ans
+
+# c) Chaining
+# Let’s reconsider the task of getting the total number of trips for each origin, 
+# dest pair for carrier “AA”.
+
+ans <- flights[carrier == 'AA', .N, .(origin,dest)]
+ans
+
+# – How can we order ans using the columns origin in ascending order, and dest 
+# in descending order?
+
+# We can store the intermediate result in a variable, and then use order(origin, -dest) 
+# on that variable. It seems fairly straightforward.
+
+ans <- ans[order(origin, -dest)]
+head(ans)
+
+# But this requires having to assign the intermediate result and then overwriting 
+# that result. We can do one better and avoid this intermediate assignment on to 
+# a variable altogether by chaining expressions.
+
+ans <- flights[carrier== 'AA', .N, .(origin, dest)][order(origin, -dest)]
+head(ans)
+
