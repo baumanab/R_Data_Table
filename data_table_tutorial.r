@@ -155,3 +155,39 @@ head(ans)
 ans <- flights[carrier== 'AA', .N, .(origin, dest)][order(origin, -dest)]
 head(ans)
 
+# d) Expressions in by
+## Can by accept expressions as well or just take columns?
+### Yes it does. As an example, if we would like to find out how many flights 
+### started late but arrived early (or on time), started and arrived late etc…
+
+ans <- flights[, .N, .(dep_delay > 0, arr_delay > 0)]
+ans
+
+# e) Multiple columns in j - .SD
+# Do we have to compute mean() for each column individually?
+
+ans <- DT[, lapply(.SD, mean), by= ID]
+ans
+
+# How can we specify just the columns we would like to compute the mean() on?
+
+ans<- flights[carrier == "AA",                       ## Only on trips with carrier "AA"
+        lapply(.SD, mean),                     ## compute the mean
+        by = .(origin, dest, month),           ## for every 'origin,dest,month'
+        .SDcols = c("arr_delay", "dep_delay")] ## for just those specified in .SDcols
+ans
+
+# f) Subset .SD for each group:
+# How can we return the first two rows for each month?
+
+ans <- flights[, head(.SD, 2), by = month]
+head(ans)
+
+# How can we concatenate columns a and b for each group in ID?
+
+DT[, .(val = c(a,b)), by = ID]
+
+# What if we would like to have all the values of column a and b concatenated, 
+# but returned as a list column?
+
+DT[, .(val = list(c(a,b))), by = ID]
